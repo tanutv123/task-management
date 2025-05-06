@@ -1,5 +1,9 @@
-import DemoPage from "../components/demo-page"
+import WelcomePage from "@/components/WelcomePage";
 
 export default function Page() {
-  return <DemoPage />
+  return (
+      <>
+          <WelcomePage/>
+      </>
+  )
 }

@@ -23,7 +23,7 @@ const customColumns: any[] = [
 ];
 
 
-export default function DemoPage() {
+export default function TablePage() {
   const [jsonInput, setJsonInput] = useState("")
   const [tableData, setTableData] = useState([]);
   const [error, setError] = useState("")

@@ -236,9 +236,6 @@ export default function DynamicTable({
         if (type === "string") {
           return strValue === filterValue;
         } else if (type === "date") {
-          console.log("formated date: ", new Date(value))
-          console.log("formated rule date: ", new Date(rule.value))
-          console.log(new Date(value).getTime() == new Date(rule.value).getTime())
           return new Date(value).getTime() === new Date(rule.value).getTime();
         } else {
           return value == rule.value
@@ -293,9 +290,7 @@ export default function DynamicTable({
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       // const firstColumnKey = autoDetectedColumns[0]?.key
-      console.log("Search Column: ", searchColumn)
       const columnKey = autoDetectedColumns[searchColumn]?.key
-      console.log("column Key: ", columnKey)
       if (columnKey) {
         result = result.filter((row) => {
           const value = row[columnKey]
