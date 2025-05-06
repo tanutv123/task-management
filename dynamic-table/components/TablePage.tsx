@@ -2,10 +2,9 @@
 
 import {useEffect, useState} from "react"
 import DynamicTable from "./dynamic-table"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import CreateTaskTab from "@/components/create-task/create-task-tab";
 
 
 // Columnas personalizadas para la tabla
@@ -24,9 +23,7 @@ const customColumns: any[] = [
 
 
 export default function TablePage() {
-  const [jsonInput, setJsonInput] = useState("")
   const [tableData, setTableData] = useState([]);
-  const [error, setError] = useState("")
   const [useCustomColumns, setUseCustomColumns] = useState(true)
 
   useEffect(() => {
@@ -43,26 +40,6 @@ export default function TablePage() {
     fetchData();
   }, []);
 
-  // Cargar datos JSON personalizados
-  const handleLoadJson = () => {
-    try {
-      const parsedData = JSON.parse(jsonInput)
-      if (!Array.isArray(parsedData)) {
-        throw new Error("Data must be an array of objects")
-      }
-      setTableData(parsedData)
-      setError("")
-    } catch (err) {
-      setError("Error parsing JSON: " + (err instanceof Error ? err.message : String(err)))
-    }
-  }
-
-  // Restablecer datos de ejemplo
-  const handleResetData = () => {
-    setTableData([])
-    setJsonInput("")
-    setError("")
-  }
 
   return (
       <div className="w-full p-4 md:p-8 space-y-8">
@@ -77,7 +54,7 @@ export default function TablePage() {
           <Tabs defaultValue="table">
             <TabsList className="mb-4">
               <TabsTrigger value="table">Table</TabsTrigger>
-              <TabsTrigger value="data">Data</TabsTrigger>
+              <TabsTrigger value="add">Add Task</TabsTrigger>
             </TabsList>
 
             <TabsContent value="table" className="space-y-4">
@@ -99,25 +76,9 @@ export default function TablePage() {
               />
             </TabsContent>
 
-            <TabsContent value="data" className="space-y-4">
+            <TabsContent value="add" className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="jsonInput">JSON Data (array of objects)</Label>
-                <div className="grid gap-4">
-                  <textarea
-                    id="jsonInput"
-                    className="min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder='[{"id": 1, "nombre": "Ejemplo", "edad": 30}]'
-                    value={jsonInput}
-                    onChange={(e) => setJsonInput(e.target.value)}
-                  />
-                  {error && <p className="text-sm text-red-500">{error}</p>}
-                  <div className="flex space-x-2">
-                    <Button onClick={handleLoadJson}>Load JSON</Button>
-                    <Button variant="outline" onClick={handleResetData}>
-                      Reset Data
-                    </Button>
-                  </div>
-                </div>
+                <CreateTaskTab/>
               </div>
             </TabsContent>
           </Tabs>
