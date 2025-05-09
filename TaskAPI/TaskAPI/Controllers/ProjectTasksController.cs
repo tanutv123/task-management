@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TaskAPI.DTOs;
 using TaskAPI.Entities;
 using TaskAPI.Extensions;
@@ -9,6 +11,7 @@ namespace TaskAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class ProjectTasksController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
