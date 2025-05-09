@@ -9,6 +9,7 @@
 
         public string Name { get; set; }
 
+        public int Priority { get; set; }
         public bool IsCompleted { get; set; }
 
         public int ProjectTaskId { get; set; }

@@ -107,7 +107,7 @@ export default function WelcomePage({
                             hover:shadow-md dark:hover:shadow-neutral-800/50"
                         >
                             <span className="opacity-90 group-hover:opacity-100 transition-opacity">
-                                <Link href={'/task-management/page.tsx'}>
+                                <Link href={'/task-management'}>
                                     Go To Dashboard
                                 </Link>
                             </span>

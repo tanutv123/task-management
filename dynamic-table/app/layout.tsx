@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import ToastProvider from "@/components/ToastProvider";
+import {StoreWrapper} from "@/store/storeWrapper";
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'Task Management App',
+  description: 'Vifon App',
+  generator: 'Tan Tai',
 }
 
 export default function RootLayout({
@@ -14,7 +16,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <StoreWrapper>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </StoreWrapper>
+      </body>
     </html>
   )
 }

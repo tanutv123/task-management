@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -15,7 +15,7 @@ import {
   Filter,
   Group,
   X,
-  Plus,
+  Plus, MoreHorizontal,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -30,6 +30,14 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import TableActionDialog from "@/components/TableActionDialog";
 
 // Tipos de datos que la tabla puede detectar
 type DataType = "string" | "number" | "date" | "boolean" | "array" | "object" | "unknown"
@@ -52,6 +60,10 @@ interface DynamicTableProps {
   sortable?: boolean
   filterable?: boolean
   groupable?: boolean
+  actionable?: boolean
+  actionChildren?: React.ReactNode,
+  setSelectedItem?: (id: any) => void,
+  tableKey?: string
 }
 
 interface FilterRule {
@@ -72,7 +84,8 @@ export default function DynamicTable({
   searchable = true,
   sortable = true,
   filterable = true,
-  groupable = true,
+  groupable = true, actionable = true, actionChildren, setSelectedItem, tableKey = "id"
+
 }: DynamicTableProps) {
   // Estado para la tabla
   const [currentPage, setCurrentPage] = useState(1)
@@ -92,6 +105,11 @@ export default function DynamicTable({
   const [expandedGroups, setExpandedGroups] = useState<string[]>([])
   const [pageSizeOptions] = useState([5, 10, 20, 50, 100])
   const [currentPageSize, setCurrentPageSize] = useState(pageSize)
+  const [openActionDialog, setOpenActionDialog] = useState(false);
+
+  const setOpenDialog = (state: boolean) => {
+    setOpenActionDialog(state);
+  }
 
   // Detectar automáticamente las columnas si no se proporcionan
   const autoDetectedColumns = useMemo(() => {
@@ -789,7 +807,14 @@ export default function DynamicTable({
                           <Table>
                             <TableBody>
                               {row.__items.map((item, itemIndex) => (
-                                <TableRow key={`${rowIndex}-${itemIndex}`}>
+                                <TableRow key={`${rowIndex}-${itemIndex}`} onClick={() => {
+                                  if (actionable) {
+                                    setOpenDialog(true);
+                                    if (setSelectedItem) {
+                                      setSelectedItem(item[tableKey]);
+                                    }
+                                  }
+                                }}>
                                   {autoDetectedColumns.map((column) => {
                                     const type = column.type || detectDataType(item[column.key])
                                     return (
@@ -810,7 +835,14 @@ export default function DynamicTable({
                   </TableCell>
                 </TableRow>
               ) : (
-                <TableRow key={rowIndex}>
+                <TableRow key={rowIndex} onClick={() => {
+                  if (actionable) {
+                    setOpenDialog(true);
+                    if (setSelectedItem) {
+                      setSelectedItem(row[tableKey]);
+                    }
+                  }
+                }}>
                   {autoDetectedColumns.map((column) => {
                     const type = column.type || detectDataType(row[column.key])
                     return (
@@ -904,6 +936,8 @@ export default function DynamicTable({
           </div>
         </div>
       )}
+      {/*Dialog Section*/}
+      <TableActionDialog open={openActionDialog} setOpen={setOpenActionDialog} children={actionChildren}/>
     </div>
   )
 }

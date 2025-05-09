@@ -1,10 +1,14 @@
 "use client"
 
-import {useEffect, useState} from "react"
+import {useEffect} from "react"
 import DynamicTable from "./dynamic-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import CreateTaskTab from "@/components/create-task/create-task-tab";
+import {useStore} from "@/store/useStore";
+import {observer} from "mobx-react-lite";
+import TableLoadingSkeleton from "@/components/TableLoadingSkeleton";
+import UpdateProgressDialog from "@/components/update-task/update-progress/UpdateProgressDialog";
 
 
 // Columnas personalizadas para la tabla
@@ -22,22 +26,13 @@ const customColumns: any[] = [
 ];
 
 
-export default function TablePage() {
-  const [tableData, setTableData] = useState([]);
-  const [useCustomColumns, setUseCustomColumns] = useState(true)
-
+function TablePage() {
+  // const [tableData, setTableData] = useState([]);
+  // const [useCustomColumns, setUseCustomColumns] = useState(true)
+  const { projectTaskStore } = useStore();
+  const { loading, projectTasks } = projectTaskStore;
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch('http://localhost:5045/api/ProjectTasks'); // or external URL
-        const data = await res.json();
-        setTableData(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
+    projectTaskStore.getProjectTasks();
   }, []);
 
 
@@ -58,28 +53,29 @@ export default function TablePage() {
             </TabsList>
 
             <TabsContent value="table" className="space-y-4">
-              {/*<div className="flex items-center space-x-2 mb-4">*/}
-              {/*  <Button variant={useCustomColumns ? "default" : "outline"} onClick={() => setUseCustomColumns(true)}>*/}
-              {/*    Custom Columns*/}
-              {/*  </Button>*/}
-              {/*  /!*<Button variant={!useCustomColumns ? "default" : "outline"} onClick={() => setUseCustomColumns(false)}>*!/*/}
-              {/*  /!*  Auto Detection*!/*/}
-              {/*  /!*</Button>*!/*/}
-              {/*</div>*/}
-
-              <DynamicTable
-                data={tableData}
-                columns={useCustomColumns ? customColumns : undefined}
-                pageSize={5}
-                filterable={true}
-                groupable={true}
-              />
+              {
+                loading ? <TableLoadingSkeleton /> : (
+                    <DynamicTable
+                        data={projectTasks}
+                        columns={customColumns}
+                        pageSize={5}
+                        filterable={true}
+                        groupable={true}
+                        actionable={true}
+                        actionChildren={(
+                            <>
+                              <UpdateProgressDialog />
+                            </>
+                        )}
+                        setSelectedItem={projectTaskStore.setSelectedProjectId}
+                        tableKey={'stt'}
+                    />
+                )
+              }
             </TabsContent>
 
             <TabsContent value="add" className="space-y-4">
-              <div className="space-y-2">
                 <CreateTaskTab/>
-              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -87,3 +83,5 @@ export default function TablePage() {
     </div>
   )
 }
+
+export default observer(TablePage);

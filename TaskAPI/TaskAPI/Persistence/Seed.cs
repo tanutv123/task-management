@@ -215,6 +215,14 @@ namespace TaskAPI.Persistence
                     },
                 };
 
+                foreach(var task in moreTasks)
+                {
+                    var i = 1;
+                    foreach (var subtask in task.Subtasks)
+                    {
+                        subtask.Priority = i++;
+                    }
+                }
 
                 context.ProjectTasks.AddRange(moreTasks);
                 context.SaveChanges();

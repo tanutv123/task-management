@@ -32,12 +32,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
 
+
 // Define the status options
 const statusOptions = [
-    { value: "pending", label: "Pending" },
-    { value: "in-progress", label: "In Progress" },
-    { value: "completed", label: "Completed" },
-    { value: "cancelled", label: "Cancelled" },
+    { value: "Chưa bắt đầu", label: "Pending" },
+    { value: "Đang thực hiện", label: "In Progress" },
+    { value: "Hoàn thành", label: "Completed" }
 ]
 
 // Define the subtask schema with priority
@@ -123,7 +123,7 @@ function SortableSubtaskItem({ id, index, form, remove }: { id: string; index: n
 // Main form component
 export function CreateTaskForm() {
     // Initialize the form with default values
-    const form = useForm<z.infer<typeof formSchema>>({
+    const form: any = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: "",
@@ -135,10 +135,12 @@ export function CreateTaskForm() {
     })
 
     // Use fieldArray to manage subtasks
-    const { fields, append, remove, move, update } = useFieldArray({
+    const { fields, append, remove, move } = useFieldArray({
         control: form.control,
         name: "subtasks",
     })
+
+
 
     // Set up sensors for drag and drop
     const sensors = useSensors(
@@ -165,12 +167,12 @@ export function CreateTaskForm() {
 
             // Move the item in the field array
             move(oldIndex, newIndex)
-
-            // Update priorities based on new positions
-            const updatedFields = arrayMove([...fields], oldIndex, newIndex)
-            updatedFields.forEach((field, index) => {
-                update(index, { ...field, priority: index })
-            })
+            //
+            // // Update priorities based on new positions
+            // const updatedFields = arrayMove([...fields], oldIndex, newIndex)
+            // updatedFields.forEach((field, index) => {
+            //     update(index, { ...field, priority: index })
+            // })
         }
     }
 
@@ -189,6 +191,7 @@ export function CreateTaskForm() {
         // Here you would typically send the data to your API
         alert("Task created successfully!")
     }
+
 
     return (
         <Form {...form}>
@@ -269,8 +272,9 @@ export function CreateTaskForm() {
                                             />
 
                                             {/* Deadline To Field */}
+                                            {/*@ts-ignore*/}
                                             <FormField
-                                                control={form.control}
+                                            control={form.control}
                                                 name="deadlineTo"
                                                 render={({ field }) => (
                                                     <FormItem>

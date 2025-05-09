@@ -5,12 +5,12 @@ export interface Subtask {
 }
 
 export interface ProjectTask {
-    id?: string
+    stt?: string
     title: string
     description: string
     deadlineFrom: Date
     deadlineTo: Date
-    status: "pending" | "in-progress" | "completed" | "cancelled"
+    status: "Hoàn thành" | "Đang thực hiện" | "Chưa bắt đầu"
     assignee: string
     creator: string
     createdDate: Date
