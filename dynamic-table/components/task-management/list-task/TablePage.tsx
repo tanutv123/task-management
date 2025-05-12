@@ -1,14 +1,14 @@
 "use client"
 
 import {useEffect} from "react"
-import DynamicTable from "./dynamic-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import CreateTaskTab from "@/components/create-task/create-task-tab";
 import {useStore} from "@/store/useStore";
 import {observer} from "mobx-react-lite";
-import TableLoadingSkeleton from "@/components/TableLoadingSkeleton";
-import UpdateProgressDialog from "@/components/update-task/update-progress/UpdateProgressDialog";
+import UpdateProgressDialog from "@/components/task-management/update-task/update-progress/UpdateProgressDialog";
+import CreateTaskTab from "@/components/task-management/create-task/create-task-tab";
+import DynamicTable from "@/components/dynamic-table";
+import TableLoadingSkeleton from "@/components/task-management/list-task/TableLoadingSkeleton";
 
 
 // Columnas personalizadas para la tabla

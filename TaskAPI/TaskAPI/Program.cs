@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Security.Cryptography;
+using TaskAPI.Extensions;
 using TaskAPI.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,48 +37,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddDbContext<AppDbContext>((sp, options) =>
-{
-    //options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
-    {
-        builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
-});
-
-var publicKeyText = File.ReadAllText("public.key");
-using var rsa = RSA.Create();
-rsa.ImportFromPem(publicKeyText);
-var rsaKey = new RsaSecurityKey(rsa);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidIssuer = "http://localhost:5241",
-        ValidAudience = "http://localhost:5045",
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = rsaKey,
-        ValidateLifetime = true
-    };
-});
-
-builder.Services.AddAuthorization();
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
 
 
 var app = builder.Build();

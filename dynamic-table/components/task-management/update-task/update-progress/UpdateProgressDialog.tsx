@@ -1,13 +1,12 @@
 import { Button } from "@/components/ui/button"
 import {
-    Dialog, DialogClose,
+    Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog"
-import UpdateProgressDialogContent from "@/components/update-task/update-progress/UpdateProgressDialogContent";
+import UpdateProgressDialogContent from "@/components/task-management/update-task/update-progress/UpdateProgressDialogContent";
 import {useEffect, useState} from "react";
 import {observer} from "mobx-react-lite";
 import {useStore} from "@/store/useStore";

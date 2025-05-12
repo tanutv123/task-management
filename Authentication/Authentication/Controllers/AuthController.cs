@@ -1,6 +1,7 @@
 ﻿using Authentication.Dtos;
 using Authentication.Entities;
 using Authentication.Services;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,14 @@ namespace Authentication.Controllers
                 return Unauthorized();
 
             var token = _jwtService.GenerateToken(user);
-            return Ok(new { token });
+            Response.Cookies.Append("access_token", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddHours(24)
+            });
+            return Ok(new { username = user.UserName, pictureUrl = user.PictureUrl });
         }
     }
 }

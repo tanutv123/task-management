@@ -46,7 +46,7 @@ namespace Authentication.Persistence
 
             var roles = new List<Role>
             {
-                new Role{Name = "Employee"},
+                new Role{Name = "IT"},
                 new Role{Name = "Admin"},
             };
 
@@ -58,7 +58,7 @@ namespace Authentication.Persistence
             foreach (var user in users)
             {
                 user.UserName = user.UserName.ToLower();
-                user.RoleId = roleManager.Roles.FirstOrDefault(x => x.Name == "Employee").Id;
+                user.RoleId = roleManager.Roles.FirstOrDefault(x => x.Name == "IT").Id;
                 var result = await userManager.CreateAsync(user, "Pa$$w0rd");
                 //await userManager.AddToRoleAsync(user, "Employee");
             }

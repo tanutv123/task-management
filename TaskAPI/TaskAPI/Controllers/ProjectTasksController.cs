@@ -6,19 +6,22 @@ using TaskAPI.DTOs;
 using TaskAPI.Entities;
 using TaskAPI.Extensions;
 using TaskAPI.Persistence;
+using TaskAPI.Services;
 
 namespace TaskAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ProjectTasksController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
+        private readonly UserService _userService;
 
-        public ProjectTasksController(AppDbContext dbContext)
+        public ProjectTasksController(AppDbContext dbContext, UserService userService)
         {
             _dbContext = dbContext;
+            _userService = userService;
         }
         [HttpGet]
         public async Task<IActionResult> GetProjectTasks()
@@ -68,10 +71,25 @@ namespace TaskAPI.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> AddProjectTask(ProjectTask projectTask)
+        public async Task<IActionResult> AddProjectTask(CreateProjectTaskDto projectTaskDto)
         {
             try
             {
+                var assignee = await _userService.GetUserByIdAsync(projectTaskDto.AssigneeId.ToString());
+                var creator = await _userService.GetUserByIdAsync(projectTaskDto.CreatorId.ToString());
+                var projectTask = new ProjectTask
+                {
+                    Title = projectTaskDto.Title,
+                    Description = projectTaskDto.Description,
+                    DeadlineFrom = projectTaskDto.DeadlineFrom,
+                    DeadlineTo = projectTaskDto.DeadlineTo,
+                    Status = projectTaskDto.Status,
+                    Assignee = assignee.UserName,
+                    AssigneeId = projectTaskDto.AssigneeId,
+                    Creator = creator.UserName,
+                    CreatorId = projectTaskDto.CreatorId,
+                    Department = creator.Department,
+                };
                 projectTask.CreatedDate = DateTime.UtcNow.GetVietnamLocalTime();
                 _dbContext.ProjectTasks.Add(projectTask);
                 await _dbContext.SaveChangesAsync();
@@ -97,14 +115,15 @@ namespace TaskAPI.Controllers
                 return BadRequest("Error occured while deleting project task");
             }
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProjectTask(int id, [FromBody] ProjectTask projectTask)
+        [HttpPut("{:id}")]
+        [Authorize(Policy = "IsInCharge")]
+        public async Task<IActionResult> UpdateProjectTask(int id, UpdateProjectTaskDto projectTaskDto)
         {
             try
             {
                 var existingTask = await _dbContext.ProjectTasks
                     .Include(t => t.Subtasks)
-                    .FirstOrDefaultAsync(t => t.Stt == id);
+                    .FirstOrDefaultAsync(t => t.Stt == projectTaskDto.Stt);
 
                 if (existingTask == null)
                 {
@@ -112,24 +131,11 @@ namespace TaskAPI.Controllers
                 }
 
                 //Update task's information 
-                existingTask.Status = projectTask.Status;
-                existingTask.Title = projectTask.Title;
-                existingTask.Description = projectTask.Description;
-                existingTask.CreatedDate = projectTask.CreatedDate;
-                existingTask.DeadlineFrom = projectTask.DeadlineFrom;
-                existingTask.DeadlineTo = projectTask.DeadlineTo;
-                existingTask.Assignee = projectTask.Assignee;
-                existingTask.Creator = projectTask.Creator;
-
-                if (existingTask.Status == "Chưa bắt đầu" && existingTask.Subtasks.Any(x => x.IsCompleted))
-                {
-                    existingTask.Status = "Đang thực hiện";
-                }
-                if (existingTask.CompletedDate == null && !existingTask.Subtasks.Any(x => !x.IsCompleted))
-                {
-                    existingTask.CompletedDate = DateTime.UtcNow.GetVietnamLocalTime();
-                    existingTask.Status = "Hoàn thành";
-                }
+                existingTask.Status = projectTaskDto.Status;
+                existingTask.Title = projectTaskDto.Title;
+                existingTask.Description = projectTaskDto.Description;
+                existingTask.DeadlineFrom = projectTaskDto.DeadlineFrom;
+                existingTask.DeadlineTo = projectTaskDto.DeadlineTo;
 
                 // Save changes
                 _dbContext.ProjectTasks.Update(existingTask);
@@ -141,8 +147,9 @@ namespace TaskAPI.Controllers
                 return BadRequest("Failed to update the tasks");
             }
         }
-        [HttpPut("subtasks")]
-        public async Task<IActionResult> UpdateSubtasks([FromBody] UpdateSubtasksRequest request)
+        [HttpPut("subtasks/{:id}")]
+        [Authorize(Policy = "IsInCharge")]
+        public async Task<IActionResult> UpdateSubtasks(int id, UpdateSubtasksRequest request)
         {
             try
             {

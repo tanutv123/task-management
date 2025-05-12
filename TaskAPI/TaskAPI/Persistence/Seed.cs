@@ -1,12 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using TaskAPI.Entities;
 namespace TaskAPI.Persistence
 {
-    
+
 
     public static class SeedData
     {
@@ -218,6 +214,9 @@ namespace TaskAPI.Persistence
                 foreach(var task in moreTasks)
                 {
                     var i = 1;
+                    task.AssigneeId = new Guid();
+                    task.CreatorId = new Guid();
+                    task.Department = "IT";
                     foreach (var subtask in task.Subtasks)
                     {
                         subtask.Priority = i++;

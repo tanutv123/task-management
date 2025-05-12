@@ -30,14 +30,8 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import TableActionDialog from "@/components/TableActionDialog";
+
 
 // Tipos de datos que la tabla puede detectar
 type DataType = "string" | "number" | "date" | "boolean" | "array" | "object" | "unknown"

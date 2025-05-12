@@ -1,12 +1,10 @@
-﻿namespace TaskAPI.Entities
-{
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using TaskAPI.Entities;
 
-    public class ProjectTask
+namespace TaskAPI.DTOs
+{
+    public class CreateProjectTaskDto
     {
-        [Key]
         public int Stt { get; set; }
         [Required]
 
@@ -25,14 +23,9 @@
         public string Status { get; set; }
         [Required]
         public Guid AssigneeId { get; set; }
-        [Required]
 
-        public string Assignee { get; set; }
         [Required]
         public Guid CreatorId { get; set; }
-        [Required]
-
-        public string Creator { get; set; }
         public string Department { get; set; }
         [Required]
 
