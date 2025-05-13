@@ -43,7 +43,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         userStore.login(data)
             .then(() => {
                 toast.success("Login success!");
-                router.push('/task-management');
+                router.push('/task-management/list');
             })
             .finally(() => setIsLoading(false));
     }

@@ -64,5 +64,5 @@ const createAxiosInstance = (baseURL: string, withCredentials = false): AxiosIns
     return instance;
 };
 
-export const taskEndpoint = createAxiosInstance("http://localhost:5045/api/", true);
-export const authEndpoint = createAxiosInstance("http://localhost:5241/api/", true);
+export const taskEndpoint = createAxiosInstance("https://localhost:5001/api/", true);
+export const authEndpoint = createAxiosInstance("https://localhost:5000/api/", true);

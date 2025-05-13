@@ -11,9 +11,11 @@ export interface ProjectTask {
     deadlineFrom: Date
     deadlineTo: Date
     status: "Hoàn thành" | "Đang thực hiện" | "Chưa bắt đầu"
+    assigneeId: string
     assignee: string
+    creatorId: string
     creator: string
+    department: string
     createdDate: Date
     completedDate?: Date
-    subtasks?: Subtask[]
 }

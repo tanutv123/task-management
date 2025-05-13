@@ -16,10 +16,13 @@ namespace TaskAPI.DTOs
         public DateTime DeadlineTo { get; set; }
 
         public string Status { get; set; }
+        public Guid AssigneeId { get; set; }
 
         public string Assignee { get; set; }
+        public Guid CreatorId { get; set; }
 
         public string Creator { get; set; }
+        public string Department { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime CreatedDate { get; set; }

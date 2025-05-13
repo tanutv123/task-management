@@ -214,8 +214,8 @@ namespace TaskAPI.Persistence
                 foreach(var task in moreTasks)
                 {
                     var i = 1;
-                    task.AssigneeId = new Guid();
-                    task.CreatorId = new Guid();
+                    task.AssigneeId = Guid.NewGuid();
+                    task.CreatorId = Guid.NewGuid();
                     task.Department = "IT";
                     foreach (var subtask in task.Subtasks)
                     {

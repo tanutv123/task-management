@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         >
           <AdminHeader sidebarWidth={sidebarWidth} onMobileMenuToggle={toggleMobileSidebar} />
 
-          <main className="flex-1 pt-16 px-4 md:px-6 lg:px-8 overflow-auto">{children}</main>
+          <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>
   )

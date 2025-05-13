@@ -30,4 +30,12 @@ export default class UserStore {
             console.log(err);
         }
     }
+
+    logout = async () => {
+        try {
+            await agent.Authentication.logout();
+        } catch {
+            toast.error("Failed to logout")
+        }
+    }
 }

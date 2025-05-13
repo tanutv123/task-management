@@ -8,36 +8,26 @@
     {
         [Key]
         public int Stt { get; set; }
-        [Required]
 
-        public string Title { get; set; }
-        [Required]
+        public required string Title { get; set; }
 
-        public string Description { get; set; }
-        [Required]
+        public required string Description { get; set; }
 
-        public DateTime DeadlineFrom { get; set; }
-        [Required]
+        public required DateTime DeadlineFrom { get; set; }
 
-        public DateTime DeadlineTo { get; set; }
-        [Required]
+        public required DateTime DeadlineTo { get; set; }
 
-        public string Status { get; set; }
-        [Required]
+        public required string Status { get; set; }
         public Guid AssigneeId { get; set; }
-        [Required]
 
-        public string Assignee { get; set; }
-        [Required]
+        public required string Assignee { get; set; }
         public Guid CreatorId { get; set; }
-        [Required]
 
-        public string Creator { get; set; }
+        public required string Creator { get; set; }
         public string Department { get; set; }
-        [Required]
 
         [DataType(DataType.Date)]
-        public DateTime CreatedDate { get; set; }
+        public required DateTime CreatedDate { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime? CompletedDate { get; set; }

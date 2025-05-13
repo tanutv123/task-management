@@ -34,6 +34,9 @@ namespace TaskAPI.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("AssigneeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("CompletedDate")
                         .HasColumnType("datetime2");
 
@@ -44,11 +47,18 @@ namespace TaskAPI.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("DeadlineFrom")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DeadlineTo")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .IsRequired()

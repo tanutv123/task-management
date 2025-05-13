@@ -5,7 +5,7 @@
 namespace TaskAPI.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddSubtaskPriority : Migration
+    public partial class AddPriority : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

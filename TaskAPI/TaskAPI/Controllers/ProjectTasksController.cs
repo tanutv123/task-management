@@ -28,19 +28,23 @@ namespace TaskAPI.Controllers
         {
             try
             {
+                var department = User.GetCustomClaim("Department");
                 var tasks = await _dbContext.ProjectTasks.Include(x => x.Subtasks)
                     .Where(x => x.Status != "Đã xóa").ToListAsync();
                 var result = tasks.Select(t => new ProjectTaskResponse
                 {
                     Stt = t.Stt,
+                    AssigneeId = t.AssigneeId,
                     Assignee = t.Assignee,
                     CompletedDate = t.CompletedDate,
                     CreatedDate = t.CreatedDate,
+                    CreatorId = t.CreatorId,
                     Creator = t.Creator,
                     DeadlineFrom = t.DeadlineFrom,
                     DeadlineTo = t.DeadlineTo,
                     Description = t.Description,
                     Status = t.Status,
+                    Department = t.Department,
                     Title = t.Title
                 });
                 return Ok(result);
@@ -89,8 +93,8 @@ namespace TaskAPI.Controllers
                     Creator = creator.UserName,
                     CreatorId = projectTaskDto.CreatorId,
                     Department = creator.Department,
+                    CreatedDate = DateTime.UtcNow.GetVietnamLocalTime()
                 };
-                projectTask.CreatedDate = DateTime.UtcNow.GetVietnamLocalTime();
                 _dbContext.ProjectTasks.Add(projectTask);
                 await _dbContext.SaveChangesAsync();
                 return Ok(projectTask);
@@ -115,7 +119,7 @@ namespace TaskAPI.Controllers
                 return BadRequest("Error occured while deleting project task");
             }
         }
-        [HttpPut("{:id}")]
+        [HttpPut("{id}")]
         [Authorize(Policy = "IsInCharge")]
         public async Task<IActionResult> UpdateProjectTask(int id, UpdateProjectTaskDto projectTaskDto)
         {
@@ -147,7 +151,7 @@ namespace TaskAPI.Controllers
                 return BadRequest("Failed to update the tasks");
             }
         }
-        [HttpPut("subtasks/{:id}")]
+        [HttpPut("subtasks/{id}")]
         [Authorize(Policy = "IsInCharge")]
         public async Task<IActionResult> UpdateSubtasks(int id, UpdateSubtasksRequest request)
         {

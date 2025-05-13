@@ -7,7 +7,7 @@ const requests = createRequests(taskEndpoint);
 const Subtasks = {
     getSubtasksByProjectTaskId: (id: number) => requests.get<Subtask[]>("ProjectTasks/subtasks/" + id),
     update: (id: number, subtasks: Subtask[]) =>
-        requests.put("ProjectTasks/subtasks/", {
+        requests.put("ProjectTasks/subtasks/" + id, {
             projectTaskId: id,
             subTasks: subtasks
         })

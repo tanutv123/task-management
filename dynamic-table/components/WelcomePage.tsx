@@ -47,9 +47,7 @@ function FloatingPaths({ position }: { position: number }) {
     )
 }
 
-export default function WelcomePage({
-                                            title = "Background Paths",
-                                        }: {
+export default function WelcomePage({title = "Background Paths",}: {
     title?: string
 }) {
     const words = title.split(" ")
@@ -107,7 +105,7 @@ export default function WelcomePage({
                             hover:shadow-md dark:hover:shadow-neutral-800/50"
                         >
                             <span className="opacity-90 group-hover:opacity-100 transition-opacity">
-                                <Link href={'/task-management'}>
+                                <Link href={'/task-management/list'}>
                                     Go To Dashboard
                                 </Link>
                             </span>

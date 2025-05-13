@@ -14,14 +14,17 @@ namespace Authentication.Controllers
     {
         private readonly UserManager<Employee> _userManager;
         private readonly SignInManager<Employee> _signInManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly JwtTokenService _jwtService;
 
         public AuthController(UserManager<Employee> userManager,
                               SignInManager<Employee> signInManager,
+                              RoleManager<Role> roleManager,
                               JwtTokenService jwtService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _jwtService = jwtService;
         }
 
@@ -41,15 +44,31 @@ namespace Authentication.Controllers
             if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
                 return Unauthorized();
 
-            var token = _jwtService.GenerateToken(user);
+            var role = await _roleManager.FindByIdAsync(user.RoleId.ToString());
+            var token = _jwtService.GenerateToken(user, role.Name);
             Response.Cookies.Append("access_token", token, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddHours(24)
             });
-            return Ok(new { username = user.UserName, pictureUrl = user.PictureUrl });
+            return Ok(new { username = user.UserName, pictureUrl = user.PictureUrl, token });
         }
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Append("access_token", "", new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(-1),
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/"
+            });
+
+            return Ok();
+        }
+
     }
 }

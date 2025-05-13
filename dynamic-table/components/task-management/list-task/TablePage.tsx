@@ -16,11 +16,12 @@ const customColumns: any[] = [
   { key: "stt", label: "STT", type: "number", sortable: true },
   { key: "title", label: "Title", type: "string", sortable: true },
   { key: "description", label: "Description", type: "string", sortable: false },
-  { key: "deadlineFrom", label: "Deadline From", type: "date", sortable: true },
+  // { key: "deadlineFrom", label: "Deadline From", type: "date", sortable: true },
   { key: "deadlineTo", label: "Deadline To", type: "date", sortable: true },
   { key: "status", label: "Status", type: "string", sortable: true },
   { key: "assignee", label: "Assignee", type: "string", sortable: true },
   { key: "creator", label: "Creator", type: "string", sortable: true },
+  { key: "department", label: "Department", type: "string", sortable: true },
   { key: "createdDate", label: "Created Date", type: "date", sortable: true },
   { key: "completedDate", label: "Completed Date", type: "date", sortable: true },
 ];
@@ -37,7 +38,7 @@ function TablePage() {
 
 
   return (
-      <div className="w-full p-4 md:p-8 space-y-8">
+      <div className="w-full">
         <Card className="w-full">
         <CardHeader>
           <CardTitle>Tasks Table</CardTitle>

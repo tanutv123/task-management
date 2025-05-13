@@ -25,8 +25,9 @@ namespace TaskAPI.Security
                 return Task.CompletedTask;
             }
 
-            var projectTaskId = int.Parse(_httpContextAccessor.HttpContext?.Request.Query["id"].ToString() ?? "");
-            if (projectTaskId == 0) 
+            var projectTaskId = int.Parse(
+                _httpContextAccessor.HttpContext?.Request.RouteValues.SingleOrDefault(x => x.Key == "id").Value?.ToString() ?? "");
+            if (projectTaskId == 0)
             {
                 return Task.CompletedTask;
             }
@@ -35,11 +36,14 @@ namespace TaskAPI.Security
             {
                 return Task.CompletedTask;
             }
-            var isValid = projectTask.AssigneeId.ToString() == userId || projectTask.CreatorId.ToString() == userId;
-            if (isValid) 
+            var isValid = projectTask.AssigneeId.ToString() == userId || 
+                projectTask.CreatorId.ToString() == userId || 
+                context.User.FindFirst("Department")?.Value == "Admin";
+            if (isValid)
             {
                 context.Succeed(requirement);
             }
             return Task.CompletedTask;
         }
     }
+}

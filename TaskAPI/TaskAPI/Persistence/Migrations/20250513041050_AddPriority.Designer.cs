@@ -12,8 +12,8 @@ using TaskAPI.Persistence;
 namespace TaskAPI.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250429032934_UpdateDbRequired")]
-    partial class UpdateDbRequired
+    [Migration("20250513041050_AddPriority")]
+    partial class AddPriority
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,6 +84,9 @@ namespace TaskAPI.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProjectTaskId")
                         .HasColumnType("int");

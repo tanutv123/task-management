@@ -1,5 +1,6 @@
 ﻿using TaskAPI.Persistence;
 using Microsoft.EntityFrameworkCore;
+using TaskAPI.Services;
 
 
 namespace TaskAPI.Extensions
@@ -19,7 +20,7 @@ namespace TaskAPI.Extensions
                 options.AddPolicy("AllowAll", builder =>
                 {
                     builder
-                        .WithOrigins("http://localhost:3000", "http://localhost:5241")
+                        .WithOrigins("https://localhost:3000", "https://localhost:5000")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
@@ -31,6 +32,8 @@ namespace TaskAPI.Extensions
             {
                 client.BaseAddress = new Uri(userServiceUrl ?? "");
             });
+            services.AddHttpContextAccessor();
+            services.AddScoped<UserService>();
             return services;
         }
     }

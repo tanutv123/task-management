@@ -6,7 +6,8 @@ import {authEndpoint} from "@/api/axios";
 const requests = createRequests(authEndpoint);
 
 const Authentication = {
-    login: (values: UserLoginForm): Promise<User> => requests.post<User>("auth/login", values)
+    login: (values: UserLoginForm): Promise<User> => requests.post<User>("auth/login", values),
+    logout: () => requests.post("auth/logout", {})
 }
 
 export default Authentication;
