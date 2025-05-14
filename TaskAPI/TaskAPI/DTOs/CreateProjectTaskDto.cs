@@ -5,7 +5,6 @@ namespace TaskAPI.DTOs
 {
     public class CreateProjectTaskDto
     {
-        public int Stt { get; set; }
         [Required]
 
         public string Title { get; set; }
@@ -23,18 +22,6 @@ namespace TaskAPI.DTOs
         public string Status { get; set; }
         [Required]
         public Guid AssigneeId { get; set; }
-
-        [Required]
-        public Guid CreatorId { get; set; }
-        public string Department { get; set; }
-        [Required]
-
-        [DataType(DataType.Date)]
-        public DateTime CreatedDate { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime? CompletedDate { get; set; }
-
         public ICollection<Subtask> Subtasks { get; set; } = new List<Subtask>();
     }
 

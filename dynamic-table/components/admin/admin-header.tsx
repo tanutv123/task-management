@@ -14,13 +14,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {observer} from "mobx-react-lite";
+import {useStore} from "@/store/useStore";
 
 interface AdminHeaderProps {
     sidebarWidth: number
     onMobileMenuToggle: () => void
 }
 
-export default function AdminHeader({ sidebarWidth, onMobileMenuToggle }: AdminHeaderProps) {
+function AdminHeader({ sidebarWidth, onMobileMenuToggle }: AdminHeaderProps) {
+    const { userStore } = useStore();
+
     const [notifications, setNotifications] = useState([
         { id: 1, title: "New order received", time: "5 minutes ago" },
         { id: 2, title: "Customer message", time: "1 hour ago" },
@@ -93,7 +97,7 @@ export default function AdminHeader({ sidebarWidth, onMobileMenuToggle }: AdminH
                             <DropdownMenuItem>Settings</DropdownMenuItem>
                             <DropdownMenuItem>Help</DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Logout</DropdownMenuItem>
+                            <DropdownMenuItem onClick={userStore.logout}>Logout</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -101,3 +105,5 @@ export default function AdminHeader({ sidebarWidth, onMobileMenuToggle }: AdminH
         </header>
     )
 }
+
+export default observer(AdminHeader);

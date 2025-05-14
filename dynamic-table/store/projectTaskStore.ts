@@ -6,6 +6,7 @@ import {toast} from "react-toastify";
 export default class ProjectTaskStore {
     projectTasks: ProjectTask[] = [];
     selectedProjectId: number | null = null;
+    selectedProjectTask: ProjectTask | null = null;
     subTasks: Subtask[] = [];
     loading = false;
     loadingSubtask = false;
@@ -15,6 +16,10 @@ export default class ProjectTaskStore {
 
     setProjectTasks = (data: ProjectTask[]) => {
         this.projectTasks = data;
+    }
+
+    setProjectTask = (data: ProjectTask) => {
+        this.selectedProjectTask = data;
     }
 
     setProjectSubtasks = (data: Subtask[]) => {
@@ -45,6 +50,17 @@ export default class ProjectTaskStore {
         }
     }
 
+    getProjectTask = async () => {
+        // this.setLoading(true);
+        try {
+            if (!this.selectedProjectId) return;
+            const result = await agent.ProjectTasks.get(this.selectedProjectId);
+            this.setProjectTask(result);
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
     getProjectSubtasks = async () => {
         try {
             if (!this.selectedProjectId) {
@@ -61,13 +77,15 @@ export default class ProjectTaskStore {
         }
     }
 
-    createProjectTask = async (data: ProjectTask) => {
-        try {
-            const result = await agent.ProjectTasks.create(data);
-            this.setProjectTasks([...this.projectTasks, result]);
-        } catch (err) {
-            console.log(err)
-        }
+    createProjectTask = async (data: any) => {
+        const result = await agent.ProjectTasks.create(data);
+        this.setProjectTasks([...this.projectTasks, result]);
+    }
+
+    updateProjectTask = async (data: any) => {
+        if (!this.selectedProjectId) return;
+        await agent.ProjectTasks.update(this.selectedProjectId, data);
+        await this.getProjectTasks();
     }
 
     updateProjectSubtasks = async (subtasks: Subtask[]) => {

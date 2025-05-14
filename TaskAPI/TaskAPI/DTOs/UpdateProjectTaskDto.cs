@@ -5,7 +5,6 @@ namespace TaskAPI.DTOs
 {
     public class UpdateProjectTaskDto
     {
-        public int Stt { get; set; }
         [Required]
 
         public string Title { get; set; }

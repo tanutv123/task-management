@@ -1,10 +1,12 @@
-﻿using Authentication.Entities;
+﻿using Authentication.Dtos;
+using Authentication.Entities;
 using Authentication.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Authentication.Controllers
 {
@@ -20,20 +22,40 @@ namespace Authentication.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        [HttpGet("{:id}")]
-        public async Task<IActionResult> GetUser(string id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(Guid id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id.ToString());
             var role = await _roleManager.FindByIdAsync(user.RoleId.ToString());
             if (user == null) return NotFound();
-            return Ok(new { user.UserName, user.Level, Department = role.Name });
+            return Ok(new { user.Id, user.UserName, user.Level, Department = role.Name });
         }
-        [HttpGet("all")]
+        [HttpGet("persistence")]
+        [Authorize]
+        public async Task<IActionResult> GetUser()
+        {
+            var user = await _userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
+            if (user == null) return BadRequest("Session Expired!");
+            return Ok(new { user.UserName, user.PictureUrl});
+        }
+        [HttpGet("department")]
         [Authorize]
         public async Task<IActionResult> GetUsers()
         {
-            var users = await _userManager.Users.ToListAsync();
-            return Ok(users);
+            var department = User.FindFirst("Department")?.Value;
+            var level = User.FindFirst("Level")?.Value;
+            var role = await _roleManager.FindByNameAsync(department ?? "");
+            var users = await _userManager.Users.Where(x => department == "Admin" || (x.RoleId == role.Id && x.Level < int.Parse(level))).ToListAsync();
+            var result = new List<UserDto>();
+            foreach (var user in users)
+            {
+                result.Add(new UserDto
+                {
+                    Id = user.Id,
+                    UserName = user.UserName
+                });
+            }
+            return Ok(result);
         }
     }
 }

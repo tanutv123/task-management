@@ -18,7 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "API-B", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "API-AUTHENTICATION", Version = "v1" });
 
     var jwtSecurityScheme = new OpenApiSecurityScheme
     {
@@ -62,9 +62,48 @@ builder.Services.AddIdentity<Employee, Role>()
     .AddRoles<Role>()
     .AddRoleManager<RoleManager<Role>>()
     .AddDefaultTokenProviders();
-//builder.Services.AddIdentity<Employee, IdentityRole>()
-//    .AddEntityFrameworkStores<AppDbContext>()
-//    .AddDefaultTokenProviders();
+
+var publicKeyText = File.ReadAllText("public.key");
+var rsa = RSA.Create();
+rsa.ImportFromPem(publicKeyText);
+var rsaKey = new RsaSecurityKey(rsa);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = rsaKey,
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("access_token"))
+            {
+                context.Token = context.Request.Cookies["access_token"];
+            }
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("Authentication failed: " + context.Exception.Message);
+            return Task.CompletedTask;
+        }
+    };
+
+});
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<JwtTokenService>();
 
@@ -84,6 +123,12 @@ app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");
 app.UseAuthentication();
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"[Middleware] IsAuthenticated: {context.User.Identity?.IsAuthenticated}");
+    await next();
+});
+
 app.UseAuthorization();
 
 app.MapControllers();

@@ -24,8 +24,8 @@ export default function TableActionDialog({ open, setOpen, children } : Props){
                 <div className="flex items-center space-x-2">
                     {children}
                 </div>
-                <DialogFooter className="sm:justify-start">
-                        <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <DialogFooter className="sm:justify-end">
+                        <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                             Close
                         </Button>
                 </DialogFooter>

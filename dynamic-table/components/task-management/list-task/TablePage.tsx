@@ -9,6 +9,8 @@ import UpdateProgressDialog from "@/components/task-management/update-task/updat
 import CreateTaskTab from "@/components/task-management/create-task/create-task-tab";
 import DynamicTable from "@/components/dynamic-table";
 import TableLoadingSkeleton from "@/components/task-management/list-task/TableLoadingSkeleton";
+import UpdateProjectTaskDialog
+  from "@/components/task-management/update-task/update-projectTask/UpdateProjectTaskDialog";
 
 
 // Columnas personalizadas para la tabla
@@ -30,9 +32,10 @@ const customColumns: any[] = [
 function TablePage() {
   // const [tableData, setTableData] = useState([]);
   // const [useCustomColumns, setUseCustomColumns] = useState(true)
-  const { projectTaskStore } = useStore();
+  const { projectTaskStore, userStore } = useStore();
   const { loading, projectTasks } = projectTaskStore;
   useEffect(() => {
+    // userStore.persistence();
     projectTaskStore.getProjectTasks();
   }, []);
 
@@ -66,6 +69,7 @@ function TablePage() {
                         actionChildren={(
                             <>
                               <UpdateProgressDialog />
+                              <UpdateProjectTaskDialog />
                             </>
                         )}
                         setSelectedItem={projectTaskStore.setSelectedProjectId}

@@ -6,9 +6,10 @@ const requests = createRequests(taskEndpoint);
 
 const ProjectTasks = {
     list: () => requests.get<ProjectTask[]>("ProjectTasks"),
-    create: (data: ProjectTask) => requests.post<ProjectTask>("ProjectTasks", data),
+    get: (id: number) => requests.get<ProjectTask>("ProjectTasks/" + id),
+    create: (data: any) => requests.post<ProjectTask>("ProjectTasks", data),
     del: (id: number) => requests.del("ProjectTasks/" + id),
-    update: (data: ProjectTask) => requests.put(`ProjectTasks/${data.stt}`, { data }),
+    update: (id: number, data: any) => requests.put(`ProjectTasks/${id}`, data),
 };
 
 export default ProjectTasks;

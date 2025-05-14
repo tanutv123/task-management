@@ -1,5 +1,4 @@
 import {User, UserLoginForm} from "@/types/user.model";
-import axios, {AxiosResponse} from "axios";
 import {createRequests} from "@/api/requests";
 import {authEndpoint} from "@/api/axios";
 

@@ -6,6 +6,7 @@ import {router} from "next/client";
 
 export default class UserStore {
     user: User | null = null;
+    departmentUsers: User[] = [];
     constructor() {
         makeAutoObservable(this)
     }
@@ -18,6 +19,19 @@ export default class UserStore {
         this.user = user;
     }
 
+    setDepartmentUsers = (users: User[]) => {
+        this.departmentUsers = users;
+    }
+
+    getDepartmentUsers = async () => {
+        try {
+            const result = await agent.Users.getUsersByDepartment();
+            this.setDepartmentUsers(result);
+        } catch {
+            toast.error("Error in getting users of your department!");
+        }
+    }
+
     login = async (creds: UserLoginForm) => {
         try {
             let user = await agent.Authentication.login(creds);
@@ -25,7 +39,7 @@ export default class UserStore {
                 toast.error("Error while login!");
                 return;
             }
-            this.user = user;
+            this.setUser(user);
         } catch (err) {
             console.log(err);
         }
@@ -36,6 +50,17 @@ export default class UserStore {
             await agent.Authentication.logout();
         } catch {
             toast.error("Failed to logout")
+        }
+    }
+
+    persistence = async () => {
+        try {
+            if (this.user) return;
+            let user = await agent.Users.persistentUser();
+            this.setUser(user);
+            console.log("user gotten:", this.user);
+        } catch (err) {
+            console.log(err);
         }
     }
 }

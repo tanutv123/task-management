@@ -30,7 +30,7 @@ namespace TaskAPI.Controllers
             {
                 var department = User.GetCustomClaim("Department");
                 var tasks = await _dbContext.ProjectTasks.Include(x => x.Subtasks)
-                    .Where(x => x.Status != "Đã xóa").ToListAsync();
+                    .Where(x => x.Status != "Đã xóa" && (department == "Admin" || x.Department == department)).ToListAsync();
                 var result = tasks.Select(t => new ProjectTaskResponse
                 {
                     Stt = t.Stt,
@@ -47,6 +47,37 @@ namespace TaskAPI.Controllers
                     Department = t.Department,
                     Title = t.Title
                 });
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error occured");
+            }
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProjectTasks(int id)
+        {
+            try
+            {
+                var department = User.GetCustomClaim("Department");
+                var t = await _dbContext.ProjectTasks.Include(x => x.Subtasks)
+                    .FirstOrDefaultAsync(x => x.Stt == id && (department == "Admin" || x.Department == department));
+                var result = new ProjectTaskResponse
+                {
+                    Stt = t.Stt,
+                    AssigneeId = t.AssigneeId,
+                    Assignee = t.Assignee,
+                    CompletedDate = t.CompletedDate,
+                    CreatedDate = t.CreatedDate,
+                    CreatorId = t.CreatorId,
+                    Creator = t.Creator,
+                    DeadlineFrom = t.DeadlineFrom,
+                    DeadlineTo = t.DeadlineTo,
+                    Description = t.Description,
+                    Status = t.Status,
+                    Department = t.Department,
+                    Title = t.Title
+                };
                 return Ok(result);
             }
             catch (Exception ex)
@@ -80,7 +111,10 @@ namespace TaskAPI.Controllers
             try
             {
                 var assignee = await _userService.GetUserByIdAsync(projectTaskDto.AssigneeId.ToString());
-                var creator = await _userService.GetUserByIdAsync(projectTaskDto.CreatorId.ToString());
+                if (assignee == null) 
+                {
+                    throw new Exception("Invalid assignee");
+                }
                 var projectTask = new ProjectTask
                 {
                     Title = projectTaskDto.Title,
@@ -89,11 +123,17 @@ namespace TaskAPI.Controllers
                     DeadlineTo = projectTaskDto.DeadlineTo,
                     Status = projectTaskDto.Status,
                     Assignee = assignee.UserName,
-                    AssigneeId = projectTaskDto.AssigneeId,
-                    Creator = creator.UserName,
-                    CreatorId = projectTaskDto.CreatorId,
-                    Department = creator.Department,
-                    CreatedDate = DateTime.UtcNow.GetVietnamLocalTime()
+                    AssigneeId = assignee.Id,
+                    Creator = User.GetUserName(),
+                    CreatorId = User.GetUserId(),
+                    Department = User.GetCustomClaim("Department") == "Admin" ? "IT" : User.GetCustomClaim("Department"),
+                    CreatedDate = DateTime.UtcNow.GetVietnamLocalTime(),
+                    Subtasks = projectTaskDto.Subtasks.Select(st => new Subtask
+                    {
+                        IsCompleted = st.IsCompleted,
+                        Name = st.Name,
+                        Priority = st.Priority
+                    }).ToList()
                 };
                 _dbContext.ProjectTasks.Add(projectTask);
                 await _dbContext.SaveChangesAsync();
@@ -127,7 +167,7 @@ namespace TaskAPI.Controllers
             {
                 var existingTask = await _dbContext.ProjectTasks
                     .Include(t => t.Subtasks)
-                    .FirstOrDefaultAsync(t => t.Stt == projectTaskDto.Stt);
+                    .FirstOrDefaultAsync(t => t.Stt == id);
 
                 if (existingTask == null)
                 {

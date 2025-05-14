@@ -14,7 +14,7 @@ namespace TaskAPI.Extensions
             {
                 throw new ArgumentNullException("ID Not found");
 
-            } else if(Guid.TryParse(user.FindFirst(ClaimTypes.NameIdentifier).Value, out result))
+            } else if(!Guid.TryParse(user.FindFirst(ClaimTypes.NameIdentifier).Value, out result))
             {
                 throw new Exception("ID Invalid");
             }

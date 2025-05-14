@@ -18,12 +18,21 @@ namespace Authentication.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        [HttpGet("all")]
-        [Authorize]
-        public async Task<IActionResult> GetUsers()
+        [HttpGet("debug-auth")]
+        [AllowAnonymous]
+        public IActionResult DebugAuth()
         {
-            //var users = await _userManager.Users.ToListAsync();
-            return Ok("vl");
+            var cookieToken = Request.Cookies["access_token"];
+            var authHeader = Request.Headers["Authorization"].ToString();
+            var isAuth = User.Identity?.IsAuthenticated ?? false;
+
+            return Ok(new
+            {
+                CookieToken = cookieToken,
+                AuthHeader = authHeader,
+                IsAuthenticated = isAuth
+            });
         }
+
     }
 }

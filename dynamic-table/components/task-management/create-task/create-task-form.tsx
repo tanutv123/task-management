@@ -1,8 +1,8 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, useFieldArray } from "react-hook-form"
+import {useForm, useFieldArray, Controller} from "react-hook-form"
 import { z } from "zod"
-import { CalendarIcon, PlusCircle, Trash2, GripVertical } from "lucide-react"
+import {CalendarIcon, PlusCircle, Trash2, GripVertical, ChevronsUpDown, Check, Loader2Icon} from "lucide-react"
 import { format } from "date-fns"
 import {
     DndContext,
@@ -31,6 +31,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
+import {observer} from "mobx-react-lite";
+import {useStore} from "@/store/useStore";
+import {useEffect, useState} from "react";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem} from "@/components/ui/command";
+import {cn} from "@/lib/utils";
+import {toast} from "react-toastify";
+import {useRouter} from "next/navigation";
 
 
 // Define the status options
@@ -60,12 +67,9 @@ const formSchema = z.object({
     status: z.string({
         required_error: "Status is required",
     }),
-    assignee: z.string().min(1, "Assignee is required"),
-    creator: z.string().min(1, "Creator is required"),
-    createdDate: z.date({
-        required_error: "Created Date is required",
-    }),
-    completedDate: z.date().optional(),
+    assigneeId: z.string().min(1, "Assignee is required"),
+    // assignees: z.array(z.string()).optional(),
+    creator: z.string(),
     subtasks: z.array(subtaskSchema).optional().default([]),
 })
 
@@ -89,7 +93,6 @@ function SortableSubtaskItem({ id, index, form, remove }: { id: string; index: n
                     name={`subtasks.${index}.name`}
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Subtask Name</FormLabel>
                             <FormControl>
                                 <Input {...field} placeholder="Enter subtask name" />
                             </FormControl>
@@ -120,41 +123,55 @@ function SortableSubtaskItem({ id, index, form, remove }: { id: string; index: n
     )
 }
 
+type FormSchema = z.infer<typeof formSchema>
+
+
 // Main form component
-export function CreateTaskForm() {
+function CreateTaskForm() {
+    const { userStore, projectTaskStore } = useStore();
+    const router = useRouter();
+    // State to store fetched options
+    const [options, setOptions] = useState([]);
+    const [loading, setLoading] = useState(false);
+    // State to store selected option
+    const [selectedOption, setSelectedOption] = useState(null);
     // Initialize the form with default values
-    const form: any = useForm<z.infer<typeof formSchema>>({
+    const form: any = useForm<FormSchema>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: "",
             description: "",
-            createdDate: new Date(),
-            creator: "Current User", // This could be auto-filled with the current user
-            subtasks: [],
+            creator: userStore.user ? userStore.user.userName : "",
+            subtasks: []
         },
     })
+
+    useEffect(() => {
+        userStore.getDepartmentUsers().then(() => {
+            const res = userStore.departmentUsers.map((user) => ({
+                value: user.id,
+                label: user.userName
+            }));
+            setOptions(res);
+        });
+    }, []);
+
 
     // Use fieldArray to manage subtasks
     const { fields, append, remove, move } = useFieldArray({
         control: form.control,
         name: "subtasks",
     })
-
-
-
-    // Set up sensors for drag and drop
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         }),
     )
-
-    // Function to add a new subtask
     const addSubtask = () => {
         // Set priority to the next number in sequence
         const priority = fields.length
-        append({ name: "", isCompleted: false, priority })
+        append({ name: "", isCompleted: false, priority, id: 0 })
     }
 
     // Handle drag end event
@@ -167,15 +184,14 @@ export function CreateTaskForm() {
 
             // Move the item in the field array
             move(oldIndex, newIndex)
-            //
-            // // Update priorities based on new positions
+
+            // Update priorities based on new positions
             // const updatedFields = arrayMove([...fields], oldIndex, newIndex)
             // updatedFields.forEach((field, index) => {
             //     update(index, { ...field, priority: index })
             // })
         }
     }
-
     // Handle form submission
     function onSubmit(values: z.infer<typeof formSchema>) {
         // Ensure priorities are set correctly before submission
@@ -186,16 +202,27 @@ export function CreateTaskForm() {
                 priority: index,
             })),
         }
+        setLoading(true);
+        projectTaskStore.createProjectTask(updatedValues)
+            .then(() => {
+                toast.success("Added successfullu");
+                router.push('/task-management/list');
+            })
+            .catch(() => toast.error("Error in adding tasks. Please try again"))
+            .finally(() => setLoading(false));
 
-        console.log("Form submitted:", updatedValues)
-        // Here you would typically send the data to your API
-        alert("Task created successfully!")
     }
 
+    const onError = (errors) => {
+        console.error("❌ Validation failed:", errors);
+    };
+
+    const today = new Date();
+    const deadlineFrom = form.watch('deadlineFrom');
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-8">
                 <Card>
                     <CardContent className="pt-6">
                         <div className="space-y-8">
@@ -263,7 +290,7 @@ export function CreateTaskForm() {
                                                                 </FormControl>
                                                             </PopoverTrigger>
                                                             <PopoverContent className="w-auto p-0" align="start">
-                                                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                                                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} fromDate={today} initialFocus />
                                                             </PopoverContent>
                                                         </Popover>
                                                         <FormMessage />
@@ -293,7 +320,12 @@ export function CreateTaskForm() {
                                                                 </FormControl>
                                                             </PopoverTrigger>
                                                             <PopoverContent className="w-auto p-0" align="start">
-                                                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                                                                <Calendar
+                                                                    mode="single"
+                                                                    selected={field.value}
+                                                                    onSelect={field.onChange}
+                                                                    minDate={deadlineFrom}
+                                                                    initialFocus />
                                                             </PopoverContent>
                                                         </Popover>
                                                         <FormMessage />
@@ -334,22 +366,6 @@ export function CreateTaskForm() {
                                             </FormItem>
                                         )}
                                     />
-
-                                    {/* Assignee Field */}
-                                    <FormField
-                                        control={form.control}
-                                        name="assignee"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Assignee</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Enter assignee name" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
                                     {/* Creator Field */}
                                     <FormField
                                         control={form.control}
@@ -366,6 +382,113 @@ export function CreateTaskForm() {
                                         )}
                                     />
                                 </div>
+                                {/* Assignee Field */}
+                                {/*<Controller*/}
+                                {/*    name="assignees"*/}
+                                {/*    control={form.control}*/}
+                                {/*    render={({ field }) => (*/}
+                                {/*        <div>*/}
+                                {/*            <label className="block text-sm font-medium mb-1">Assignees</label>*/}
+                                {/*            <Popover>*/}
+                                {/*                <PopoverTrigger asChild>*/}
+                                {/*                    <Button variant="outline" className="w-full justify-between">*/}
+                                {/*                        {field.value.length > 0*/}
+                                {/*                            ? selectedLabels(field.value)*/}
+                                {/*                            : "Select assignees"}*/}
+                                {/*                    </Button>*/}
+                                {/*                </PopoverTrigger>*/}
+                                {/*                <PopoverContent className="w-full p-0">*/}
+                                {/*                    <Command>*/}
+                                {/*                        <CommandInput placeholder="Search assignees..." />*/}
+                                {/*                        <CommandGroup>*/}
+                                {/*                            {options.map((option) => {*/}
+                                {/*                                const isSelected = field.value.includes(option.value)*/}
+                                {/*                                return (*/}
+                                {/*                                    <CommandItem*/}
+                                {/*                                        key={option.value}*/}
+                                {/*                                        onSelect={() => {*/}
+                                {/*                                            if (isSelected) {*/}
+                                {/*                                                field.onChange(field.value.filter(val => val !== option.value))*/}
+                                {/*                                            } else {*/}
+                                {/*                                                field.onChange([...field.value, option.value])*/}
+                                {/*                                            }*/}
+                                {/*                                        }}*/}
+                                {/*                                    >*/}
+                                {/*                                        <Check*/}
+                                {/*                                            className={cn(*/}
+                                {/*                                                "mr-2 h-4 w-4",*/}
+                                {/*                                                isSelected ? "opacity-100" : "opacity-0"*/}
+                                {/*                                            )}*/}
+                                {/*                                        />*/}
+                                {/*                                        {option.label}*/}
+                                {/*                                    </CommandItem>*/}
+                                {/*                                )*/}
+                                {/*                            })}*/}
+                                {/*                        </CommandGroup>*/}
+                                {/*                    </Command>*/}
+                                {/*                </PopoverContent>*/}
+                                {/*            </Popover>*/}
+                                {/*            {form.formState.errors.assignees && (*/}
+                                {/*                <p className="text-sm text-red-500 mt-1">*/}
+                                {/*                    {form.formState.errors.assignees.message}*/}
+                                {/*                </p>*/}
+                                {/*            )}*/}
+                                {/*        </div>*/}
+                                {/*    )}*/}
+                                {/*/>*/}
+                                <Controller
+                                    name="assigneeId"
+                                    control={form.control}
+                                    render={({ field }) => {
+                                        const selectedOption = options.find(opt => opt.value === field.value)
+                                        return (
+                                            <div className="w-full">
+                                                <label className="block mb-1 text-sm font-medium">Assignee</label>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className="w-full justify-between"
+                                                        >
+                                                            {selectedOption ? selectedOption.label : "Select assignee"}
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                                        <Command>
+                                                            <CommandInput placeholder="Search assignee..." />
+                                                            <CommandEmpty>No assignee found.</CommandEmpty>
+                                                            <CommandGroup>
+                                                                {options.map((option) => (
+                                                                    <CommandItem
+                                                                        key={option.value}
+                                                                        onSelect={() => field.onChange(option.value)}
+                                                                    >
+                                                                        <Check
+                                                                            className={cn(
+                                                                                "mr-2 h-4 w-4",
+                                                                                field.value === option.value
+                                                                                    ? "opacity-100"
+                                                                                    : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                        {option.label}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
+                                                {form.formState.errors.assignee && (
+                                                    <p className="text-sm text-red-500 mt-1">
+                                                        {form.formState.errors.assignee.message}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )
+                                    }}
+                                />
                             </div>
                         </div>
 
@@ -404,9 +527,13 @@ export function CreateTaskForm() {
                     <Button type="button" variant="outline" onClick={() => form.reset()}>
                         Cancel
                     </Button>
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit">
+                        {loading ? <Loader2Icon className={'animate-spin'}/> : 'Submit'}
+                    </Button>
                 </div>
             </form>
         </Form>
     )
 }
+
+export default observer(CreateTaskForm);

@@ -5,7 +5,7 @@ export interface Subtask {
 }
 
 export interface ProjectTask {
-    stt?: string
+    stt?: number
     title: string
     description: string
     deadlineFrom: Date

@@ -14,7 +14,7 @@ namespace TaskAPI.Services
 
         public async Task<UserDto?> GetUserByIdAsync(string userId)
         {
-            var response = await _httpClient.GetAsync($"/users/{userId}");
+            var response = await _httpClient.GetAsync($"users/{userId}");
 
             if (!response.IsSuccessStatusCode)
                 return null;
