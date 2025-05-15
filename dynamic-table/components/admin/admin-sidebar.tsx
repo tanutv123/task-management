@@ -161,8 +161,8 @@ function AdminSidebar({collapsed: collapsedProp, mobileOpen: mobileOpenProp, onT
                             </Avatar>
                             {!collapsed && (
                                 <div className="ml-3">
-                                    <p className="text-sm font-medium text-gray-700 dark:text-gray-200">John Doe</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">Admin</p>
+                                    <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{userStore.user?.userName}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{userStore.user?.department}</p>
                                 </div>
                             )}
                         </div>

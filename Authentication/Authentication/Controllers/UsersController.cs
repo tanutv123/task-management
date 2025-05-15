@@ -1,8 +1,6 @@
 ﻿using Authentication.Dtos;
 using Authentication.Entities;
-using Authentication.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,8 +33,9 @@ namespace Authentication.Controllers
         public async Task<IActionResult> GetUser()
         {
             var user = await _userManager.FindByIdAsync(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "");
+            var role = await _roleManager.FindByIdAsync(user.RoleId.ToString());
             if (user == null) return BadRequest("Session Expired!");
-            return Ok(new { user.UserName, user.PictureUrl});
+            return Ok(new { user.Id, user.UserName, user.PictureUrl, Department = role.Name});
         }
         [HttpGet("department")]
         [Authorize]

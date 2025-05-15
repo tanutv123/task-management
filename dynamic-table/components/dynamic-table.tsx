@@ -78,7 +78,7 @@ export default function DynamicTable({
   searchable = true,
   sortable = true,
   filterable = true,
-  groupable = true, actionable = true, actionChildren, setSelectedItem, tableKey = "id"
+  groupable = true, actionable = false, actionChildren, setSelectedItem, tableKey = "id"
 
 }: DynamicTableProps) {
   // Estado para la tabla
@@ -529,7 +529,7 @@ export default function DynamicTable({
             )}
             <Input
               type="search"
-              placeholder="Buscar..."
+              placeholder="Find something..."
               className="flex-grow border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

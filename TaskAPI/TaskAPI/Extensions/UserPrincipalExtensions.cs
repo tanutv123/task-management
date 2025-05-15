@@ -35,6 +35,15 @@ namespace TaskAPI.Extensions
             return user.FindFirst(ClaimTypes.Name).Value;
         }
 
+        public static string GetPictureUrl(this ClaimsPrincipal user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException("User is null");
+            }
+            return user.FindFirst("PictureUrl")?.Value ?? "";
+        }
+
         public static string GetCustomClaim(this ClaimsPrincipal user, string claimName)
         {
             if (user == null)

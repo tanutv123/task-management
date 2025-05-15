@@ -202,10 +202,14 @@ function CreateTaskForm() {
                 priority: index,
             })),
         }
+        if (updatedValues.deadlineFrom > updatedValues.deadlineTo) {
+            toast.error("Invalid deadline");
+            return;
+        }
         setLoading(true);
         projectTaskStore.createProjectTask(updatedValues)
             .then(() => {
-                toast.success("Added successfullu");
+                toast.success("Added successfully   ");
                 router.push('/task-management/list');
             })
             .catch(() => toast.error("Error in adding tasks. Please try again"))

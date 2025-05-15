@@ -86,6 +86,10 @@ function UpdateProjectTaskContent({ isOpen, setOpen } : Props) {
         const updatedValues = {
             ...values
         }
+        if (updatedValues.deadlineFrom > updatedValues.deadlineTo) {
+            toast.error("Invalid deadline")
+            return;
+        }
         setLoading(true);
         projectTaskStore.updateProjectTask(updatedValues)
             .then(() => {

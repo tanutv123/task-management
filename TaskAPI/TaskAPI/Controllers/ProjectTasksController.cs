@@ -30,7 +30,7 @@ namespace TaskAPI.Controllers
             {
                 var department = User.GetCustomClaim("Department");
                 var tasks = await _dbContext.ProjectTasks.Include(x => x.Subtasks)
-                    .Where(x => x.Status != "Đã xóa" && (department == "Admin" || x.Department == department)).ToListAsync();
+                    .Where(x => department == "Admin" || (x.Status != "Đã xóa" && x.Department == department)).ToListAsync();
                 var result = tasks.Select(t => new ProjectTaskResponse
                 {
                     Stt = t.Stt,
@@ -61,7 +61,7 @@ namespace TaskAPI.Controllers
             {
                 var department = User.GetCustomClaim("Department");
                 var t = await _dbContext.ProjectTasks.Include(x => x.Subtasks)
-                    .FirstOrDefaultAsync(x => x.Stt == id && (department == "Admin" || x.Department == department));
+                    .FirstOrDefaultAsync(x => department == "Admin" || (x.Stt == id && x.Department == department));
                 var result = new ProjectTaskResponse
                 {
                     Stt = t.Stt,
@@ -115,6 +115,10 @@ namespace TaskAPI.Controllers
                 {
                     throw new Exception("Invalid assignee");
                 }
+                if(projectTaskDto.DeadlineFrom > projectTaskDto.DeadlineTo)
+                {
+                    return BadRequest("Invalid Deadline");
+                }
                 var projectTask = new ProjectTask
                 {
                     Title = projectTaskDto.Title,
@@ -145,11 +149,13 @@ namespace TaskAPI.Controllers
             }
         }
         [HttpDelete("{id}")]
+        [Authorize(Policy = "IsInCharge")]
         public async Task<IActionResult> DeleteProjectTask(int id)
         {
             try
             {
-                var projectTask = await _dbContext.ProjectTasks.FirstOrDefaultAsync(x => x.Stt == id);
+                var projectTask = await _dbContext.ProjectTasks
+                    .FirstOrDefaultAsync(x => x.Stt == id);
                 projectTask.Status = "Đã xóa";
                 await _dbContext.SaveChangesAsync();
                 return Ok();

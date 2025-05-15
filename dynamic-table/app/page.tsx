@@ -1,10 +1,9 @@
+import { CommentSection } from "@/components/comment-section"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import WelcomePage from "@/components/WelcomePage";
-import {store} from "@/store/store";
 
-export default function Page() {
+export default function Home() {
   return (
-      <>
-          <WelcomePage/>
-      </>
+      <WelcomePage/>
   )
 }
