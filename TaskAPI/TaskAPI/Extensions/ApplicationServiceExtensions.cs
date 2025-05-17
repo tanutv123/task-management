@@ -20,7 +20,7 @@ namespace TaskAPI.Extensions
                 options.AddPolicy("AllowAll", builder =>
                 {
                     builder
-                        .WithOrigins("https://localhost:3000", "https://localhost:5000")
+                        .WithOrigins("https://localhost:3000", "http://localhost:3000", "https://localhost:5000")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();

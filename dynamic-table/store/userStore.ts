@@ -58,7 +58,6 @@ export default class UserStore {
             if (this.user) return;
             let user = await agent.Users.persistentUser();
             this.setUser(user);
-            console.log("user gotten:", this.user);
         } catch (err) {
             console.log(err);
         }

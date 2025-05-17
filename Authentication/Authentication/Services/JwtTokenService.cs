@@ -30,7 +30,7 @@ namespace Authentication.Services
             new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-            new Claim("PictureUrl", user.PictureUrl),
+            new Claim("PictureUrl", user.PictureUrl ?? ""),
             new Claim("Level", user.Level.ToString()),
             new Claim("Department", department)
         };

@@ -1,13 +1,15 @@
-import ProjectTasks from "./endpoints/projectTasks";
-import Subtasks from "./endpoints/subtasks";
 import Authentication from "@/api/endpoints/authentication";
 import Users from "@/api/endpoints/users";
+import Comments from "@/api/endpoints/comments";
+import Subtasks from "@/api/endpoints/subTasks";
+import ProjectTasks from "@/api/endpoints/projectTasks";
 
 const agent = {
     ProjectTasks,
     Subtasks,
     Authentication,
-    Users
+    Users,
+    Comments
 };
 
 export default agent;

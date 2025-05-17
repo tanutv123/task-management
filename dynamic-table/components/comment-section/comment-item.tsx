@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -8,6 +8,8 @@ import { formatDistanceToNow } from "date-fns"
 import { Edit, Trash2, Reply } from "lucide-react"
 import type { Comment } from "@/types/comment"
 import { CommentType, commentTypeInfo } from "@/types/comment"
+import {observer} from "mobx-react-lite";
+import {useStore} from "@/store/useStore";
 
 interface CommentItemProps {
   comment: Comment
@@ -20,7 +22,7 @@ interface CommentItemProps {
   onReply?: () => void
 }
 
-export function CommentItem({
+function CommentItem({
   comment,
   isReply = false,
   isEditing = false,
@@ -30,8 +32,16 @@ export function CommentItem({
   onDelete,
   onReply,
 }: CommentItemProps) {
+  const { userStore } = useStore();
+  const { user } = userStore;
   const [editContent, setEditContent] = useState(comment.content)
-  const isCurrentUser = comment.userId === "current-user"
+  const [ isCurrentUser, setIsCurrentUser ] = useState(false);
+
+  useEffect(() => {
+    if (user && user.id === comment.userId) {
+      setIsCurrentUser(true);
+    }
+  }, []);
 
   // Get initials from name
   const getInitials = (name: string) => {
@@ -49,7 +59,7 @@ export function CommentItem({
   return (
     <div className="flex gap-3">
       <Avatar className="h-8 w-8">
-        <AvatarImage src={comment.userImage || "/placeholder.svg"} alt={comment.userName} />
+        <AvatarImage src={comment.userImage || "/user.jpg"} alt={comment.userName} />
         <AvatarFallback>{getInitials(comment.userName)}</AvatarFallback>
       </Avatar>
 
@@ -59,9 +69,10 @@ export function CommentItem({
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium">{comment.userName}</span>
               {comment.commentType && (
-                <span className={`px-2 py-0.5 rounded text-xs ${typeInfo.color}`}>{typeInfo.label}</span>
+                <span className={`px-2 py-0.5 rounded text-xs ${typeInfo.color} ${typeInfo.label === "Issue" ? "bg-red-100" : ""} ${typeInfo.label === "Issue" ? "text-red-500" : ""}`}>{typeInfo.label}</span>
               )}
               <span className="text-xs text-gray-500">
+                {/*@ts-ignore*/}
                 {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
               </span>
               {comment.updatedAt > comment.createdAt && <span className="text-xs text-gray-500">(edited)</span>}
@@ -108,3 +119,5 @@ export function CommentItem({
     </div>
   )
 }
+
+export default observer(CommentItem);

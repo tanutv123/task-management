@@ -1,9 +1,11 @@
 import TablePage from "@/components/task-management/list-task/TablePage";
-import AdminLayout from "@/components/admin/admin-layout";
+import CommentPage from "@/components/comment-section/comment-page";
 
 const Page = () => {
     return (
-        <TablePage/>
+        <>
+            <TablePage/>
+        </>
     )
 }
 

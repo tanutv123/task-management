@@ -1,6 +1,6 @@
 export interface Comment {
   id: number
-  projectTaskId: string
+  projectTaskId: number
   userId: string
   userName: string
   userImage: string
@@ -12,7 +12,7 @@ export interface Comment {
 }
 
 export interface CommentWithReplies extends Comment {
-  replies: CommentWithReplies[]
+  replies: Comment[]
 }
 
 // Add a new enum for comment types

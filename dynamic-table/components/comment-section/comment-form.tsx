@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Paperclip, AtSign, Send } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CommentType, commentTypeInfo } from "@/types/comment"
+import {CommentType, commentTypeInfo} from "@/types/comment"
 
 interface CommentFormProps {
   onSubmit: (content: string, commentType: CommentType) => void
@@ -52,7 +52,7 @@ export function CommentForm({
           <SelectContent>
             {Object.entries(commentTypeInfo).map(([type, info]) => (
               <SelectItem key={type} value={type}>
-                <span className={`px-2 py-0.5 rounded text-xs ${info.color}`}>{info.label}</span>
+                <span className={`px-2 py-0.5 rounded text-xs ${info.color} ${info.label === "Issue" ? "text-red-500" : ""}`}>{info.label}</span>
               </SelectItem>
             ))}
           </SelectContent>

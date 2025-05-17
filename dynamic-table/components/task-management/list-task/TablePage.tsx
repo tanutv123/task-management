@@ -13,6 +13,7 @@ import UpdateProjectTaskDialog
   from "@/components/task-management/update-task/update-projectTask/UpdateProjectTaskDialog";
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
+import Link from "next/link";
 
 
 // Columnas personalizadas para la tabla
@@ -32,7 +33,7 @@ const customColumns: any[] = [
 
 
 function TablePage() {
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState<any[]>([]);
   const [error, setError] = useState("")
   const [jsonInput, setJsonInput] = useState("")
   const { projectTaskStore, userStore } = useStore();
@@ -88,6 +89,11 @@ function TablePage() {
                             <>
                               <UpdateProgressDialog />
                               <UpdateProjectTaskDialog />
+                              <Button variant={"outline"}>
+                                <Link href={"/task-management/comment"}>
+                                  View Comments
+                                </Link>
+                              </Button>
                             </>
                         )}
                         setSelectedItem={projectTaskStore.setSelectedProjectId}

@@ -1,4 +1,4 @@
-import { CommentSection } from "@/components/comment-section"
+import { CommentSection } from "@/components/comment-section/comment-section"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import WelcomePage from "@/components/WelcomePage";
 

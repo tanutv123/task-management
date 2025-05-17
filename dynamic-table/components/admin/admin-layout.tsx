@@ -63,7 +63,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             className="flex-1 flex flex-col transition-all duration-300 ease-in-out"
             style={{
               marginLeft: isMobile ? 0 : `${sidebarWidth}px`,
-              width: isMobile < 768 ? "100%" : `calc(100% - ${sidebarWidth}px)`,
+              width: isMobile ? "100%" : `calc(100% - ${sidebarWidth}px)`,
             }}
         >
           <AdminHeader sidebarWidth={sidebarWidth} onMobileMenuToggle={toggleMobileSidebar} />
